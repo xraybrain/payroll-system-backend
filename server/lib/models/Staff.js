@@ -40,8 +40,8 @@ exports.Staff = class {
 
 exports.createStaff = (formData = {}) => {
   let imageUrl;
-  if (process.env.NODE_ENV === 'production' && formData.uploadURL) {
-    imageUrl = formData.uploadURL || null;
+  if (process.env.NODE_ENV === 'production' && formData.fileName) {
+    imageUrl = formData.fileName || '/assets/avatar.png';
   } else if (formData.fileName) {
     imageUrl = `/assets/uploads/${formData.fileName}`;
   } else {
