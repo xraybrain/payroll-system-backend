@@ -100,107 +100,6 @@ const calculateMisc = (
   return parseFloat(amount.toFixed(2));
 };
 
-// const calculateGrossPay = (
-//   misc = {},
-//   staff = {},
-//   consolidated = 0.0,
-//   grossPay = 0.0
-// ) => {
-//   let calculated = { amount: 0.0, misc: null };
-
-//   if (misc.category === MiscType.Allowance) {
-//     if (misc.classId && staff.classId === misc.classId) {
-//       if (misc.level && staff.level >= misc.level) {
-//         calculated.amount += calculateMisc(
-//           misc,
-//           MiscType.Allowance,
-//           consolidated,
-//           grossPay
-//         );
-//         calculated.misc = misc;
-//       } else {
-//         calculated.amount += calculateMisc(
-//           misc,
-//           MiscType.Allowance,
-//           consolidated,
-//           grossPay
-//         );
-//         calculated.misc = misc;
-//       }
-//     } else if (
-//       misc.restrictedGender &&
-//       staff.gender === misc.restrictedGender
-//     ) {
-//       calculated.amount += calculateMisc(
-//         misc,
-//         MiscType.Allowance,
-//         consolidated,
-//         grossPay
-//       );
-//       calculated.misc = misc;
-//     } else if (!misc.classId && !misc.level && !misc.restrictedGender) {
-//       calculated.amount += calculateMisc(
-//         misc,
-//         MiscType.Allowance,
-//         consolidated,
-//         grossPay
-//       );
-//       calculated.misc = misc;
-//     } else {
-//       // do nothing
-//     }
-//   }
-
-//   return calculated;
-// };
-
-// const calculateDeduction = (misc = {}, staff = {}, consolidated, grossPay) => {
-//   let calculated = { amount: 0.0, misc: null };
-//   if (misc.category === MiscType.Deduction) {
-//     if (misc.classId && staff.classId === misc.classId) {
-//       if (misc.level && staff.level >= misc.level) {
-//         calculated.amount += calculateMisc(
-//           misc,
-//           MiscType.Deduction,
-//           consolidated,
-//           grossPay
-//         );
-//         calculated.misc = misc;
-//       } else {
-//         calculated.amount += calculateMisc(
-//           misc,
-//           MiscType.Deduction,
-//           consolidated,
-//           grossPay
-//         );
-//         calculated.misc = misc;
-//       }
-//     } else if (
-//       misc.restrictedGender &&
-//       staff.gender === misc.restrictedGender
-//     ) {
-//       calculated.amount += calculateMisc(
-//         misc,
-//         MiscType.Deduction,
-//         consolidated,
-//         grossPay
-//       );
-//       calculated.misc = misc;
-//     } else if (!misc.classId && !misc.level && !misc.restrictedGender) {
-//       calculated.amount += calculateMisc(
-//         misc,
-//         MiscType.Deduction,
-//         consolidated,
-//         grossPay
-//       );
-//       calculated.misc = misc;
-//     } else {
-//       // do nothing
-//     }
-//   }
-//   return calculated;
-// };
-
 const calculate = (
   miscType,
   misc = {},
@@ -230,8 +129,8 @@ const calculate = (
         calculated.misc = misc;
       }
     } else if (
-      misc.restrictedGender &&
-      staff.gender === misc.restrictedGender
+      misc.genderRestricted &&
+      staff.gender === misc.genderRestricted
     ) {
       calculated.amount += calculateMisc(
         misc,
@@ -240,7 +139,7 @@ const calculate = (
         grossPay
       );
       calculated.misc = misc;
-    } else if (!misc.classId && !misc.level && !misc.restrictedGender) {
+    } else if (!misc.classId && !misc.level && !misc.genderRestricted) {
       calculated.amount += calculateMisc(
         misc,
         miscType,

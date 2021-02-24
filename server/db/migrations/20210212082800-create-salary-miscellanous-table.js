@@ -10,6 +10,7 @@ module.exports = {
       mixedId: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
+        unique: true
       },
       miscId: {
         type: Sequelize.INTEGER(11),
