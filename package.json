@@ -1,7 +1,7 @@
 {
-  "name": "multi-media-sharing",
+  "name": "payroll-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "a payroll system",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"

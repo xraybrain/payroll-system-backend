@@ -79,7 +79,7 @@ exports.saveStaff = async (req, res, next) => {
     try {
       let { formData, uploadURL, fileName } = feedback.result;
       formData = JSON.parse(formData);
-      formData.fileName = fileName;
+      formData.fileName = fileName || uploadURL;
       let staffData = createStaff(formData);
       let errors = {};
       validateStaff(errors, staffData);
