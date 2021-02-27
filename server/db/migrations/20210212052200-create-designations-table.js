@@ -7,17 +7,10 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      deptId: {
-        type: Sequelize.INTEGER(11),
-        allowNull: false,
-        references: {
-          model: 'Departments',
-          key: 'id',
-        },
-      },
       name: {
         type: Sequelize.STRING(100),
         allowNull: false,
+        unique: true
       },
       createdAt: {
         type: Sequelize.DATE,

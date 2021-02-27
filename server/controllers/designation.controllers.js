@@ -24,9 +24,8 @@ exports.getDesignations = async (req, res, next) => {
   let feedback;
   let page = Number(req.query.page) || 1;
   let paginate = req.query.paginate === 'false' ? false : true;
-  let limit = Number(req.query.limit) || 20;
+  let limit = Number(req.query.limit) || 10;
   let { searchquery } = req.query;
-  let { did } = req.params;
 
   try {
     let filter = {};
@@ -39,8 +38,6 @@ exports.getDesignations = async (req, res, next) => {
         },
       ];
     }
-
-    filter.deptId = did;
 
     let pager = new Pager('Designation', limit, page);
     feedback = await pager.getData(filter, [], [['name', 'ASC']], paginate);
@@ -67,7 +64,7 @@ exports.saveDesignation = async (req, res, next) => {
         });
         if (desgExists)
           return res.send(
-            new Feedback(null, false, 'Department already has this designation')
+            new Feedback(null, false, 'Designation already exists')
           );
         feedback = await createData('Designation', desgData);
       } else {

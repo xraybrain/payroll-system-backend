@@ -40,12 +40,7 @@ exports.getDepartments = async (req, res, next) => {
       ];
     }
     let pager = new Pager('Department', limit, page);
-    feedback = await pager.getData(
-      filter,
-      Constants.DepartmentInclude,
-      [['name', 'ASC']],
-      paginate
-    );
+    feedback = await pager.getData(filter, [], [['name', 'ASC']], paginate);
   } catch (error) {
     feedback = generateErrorFeedback(error);
   }
@@ -57,6 +52,7 @@ exports.saveDepartment = async (req, res, next) => {
   let { formData, authorization } = Sanitizer.sanitize(req.body);
   let authUser = GetAuthUser(authorization);
   let feedback;
+  
   if (authUser) {
     try {
       let deptData = createDepartment(formData);
@@ -88,6 +84,7 @@ exports.saveDepartment = async (req, res, next) => {
 exports.updateDepartment = async (req, res, next) => {
   let { formData, authorization } = Sanitizer.sanitize(req.body);
   let authUser = GetAuthUser(authorization);
+  console.log(authorization)
   let feedback;
   if (authUser) {
     try {

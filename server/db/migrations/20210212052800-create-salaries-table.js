@@ -33,7 +33,7 @@ module.exports = {
       },
       status: {
         type: Sequelize.STRING(40),
-        allowNull: false,
+        defaultValue: 'pending',
       },
       consolidated: {
         type: Sequelize.DECIMAL(12, 2),

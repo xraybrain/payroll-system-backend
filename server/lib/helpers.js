@@ -140,12 +140,6 @@ exports.validateDesignation = (errors = {}, formData, isUpdating = false) => {
     { field: 'name', as: 'Designation Name' },
     isUpdating
   );
-  validate.isFieldEmpty(
-    errors,
-    formData,
-    { field: 'deptId', as: 'Department Name' },
-    isUpdating
-  );
 };
 
 exports.validateMiscellanous = (errors = {}, formData, isUpdating = false) => {

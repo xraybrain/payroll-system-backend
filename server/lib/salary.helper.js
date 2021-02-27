@@ -119,7 +119,7 @@ const calculate = (
           grossPay
         );
         calculated.misc = misc;
-      } else {
+      } else if (!misc.level) {
         calculated.amount += calculateMisc(
           misc,
           miscType,
@@ -127,6 +127,8 @@ const calculate = (
           grossPay
         );
         calculated.misc = misc;
+      } else {
+        // do nothing
       }
     } else if (
       misc.genderRestricted &&

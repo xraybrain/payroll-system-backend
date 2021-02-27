@@ -29,7 +29,7 @@ module.exports = {
         },
       },
       subTotalAmount: {
-        type: Sequelize.DECIMAL(8, 2),
+        type: Sequelize.DECIMAL(12, 2),
         allowNull: false,
       },
       createdAt: {

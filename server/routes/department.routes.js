@@ -9,6 +9,7 @@ const {
   saveDesignation,
   updateDesignation,
   deleteDesignation,
+  getDesignations,
 } = require('../controllers/designation.controllers');
 
 router.get('/departments/', getDepartments);
@@ -16,8 +17,9 @@ router.post('/departments/', saveDepartment);
 router.put('/departments/', updateDepartment);
 router.delete('/departments/', deleteDepartment);
 
-router.post('/departments/designations/', saveDesignation);
-router.put('/departments/designations/', updateDesignation);
-router.delete('/departments/designations/', deleteDesignation);
+router.get('/designations/', getDesignations);
+router.post('/designations/', saveDesignation);
+router.put('/designations/', updateDesignation);
+router.delete('/designations/', deleteDesignation);
 
 module.exports = router;

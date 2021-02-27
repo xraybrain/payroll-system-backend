@@ -3,14 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     'Designation',
     {
       id: { type: DataTypes.INTEGER, primaryKey: true },
-      deptId: {
-        type: DataTypes.INTEGER(11),
-        allowNull: false,
-        references: {
-          model: 'departments',
-          key: 'id',
-        },
-      },
       name: { type: DataTypes.STRING },
     },
     {
@@ -22,10 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     models.Designation.hasMany(models.Staff, {
       foreignKey: 'dsgId',
       model: 'staffs',
-    });
-    models.Designation.belongsTo(models.Department, {
-      foreignKey: 'deptId',
-      model: 'departments',
     });
   };
   return Designation;

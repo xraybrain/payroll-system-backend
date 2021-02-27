@@ -17,9 +17,10 @@ const {
   generateFormErrorFeedack,
   generatePermissionErrorFeedback,
 } = require('../lib/models/ErrorHandler');
-const { createStaff } = require('../lib/models/Staff');
+const { createStaff, Staff } = require('../lib/models/Staff');
 const { GetAuthUser } = require('../lib/AuthManager');
 const { Constants } = require('../lib/models/Constants');
+const { excelReader } = require('../services/excel-reader');
 const Model = 'Staff';
 
 exports.getStaffs = async (req, res, next) => {
@@ -63,7 +64,7 @@ exports.getStaffs = async (req, res, next) => {
     feedback = await pager.getData(
       filter,
       Constants.staffIncludes,
-      [['createdAt', 'DESC']],
+      [['surname', 'ASC']],
       paginate
     );
   } catch (error) {
@@ -106,6 +107,153 @@ exports.saveStaff = async (req, res, next) => {
       } else {
         feedback = generateFormErrorFeedack(errors);
       }
+    } catch (error) {
+      console.log(error);
+      feedback = generateErrorFeedback(error);
+    }
+  }
+
+  res.json(feedback);
+};
+
+exports.saveStaffsUpload = async (req, res, next) => {
+  let feedback = req.body;
+  if (feedback.success) {
+    try {
+      let { formData, uploadURL, fileName } = feedback.result;
+      if (formData) formData = JSON.parse(formData);
+      let staffsJSON = excelReader(uploadURL);
+      let staffsData = [];
+      let errors = {};
+
+      // console.log(staffsJSON);
+      let index = 0;
+      for (let rawStaff of staffsJSON.Sheet1) {
+        let salaryStructure = await BaseModel.SalaryStructure.findOne({
+          where: { shortName: rawStaff.SalaryStructure },
+        });
+        let dept = await BaseModel.Department.findOne({
+          where: { name: rawStaff.Department },
+        });
+        let dsg = await BaseModel.Designation.findOne({
+          where: { name: rawStaff.Designation },
+        });
+        let bank = await BaseModel.Bank.findOne({
+          where: { name: rawStaff.Bank },
+        });
+        let staffClass = await BaseModel.StaffClass.findOne({
+          where: { name: rawStaff.Class },
+        });
+
+        errors[
+          `${index}`
+        ] = `${rawStaff.Surname} ${rawStaff.Firstname} ${rawStaff.Othername}`;
+
+        if (salaryStructure) {
+          let structureExists = await dataExists('SalaryStructureList', {
+            level: rawStaff.Level,
+            grade: rawStaff.Grade,
+            structureId: salaryStructure.id,
+          });
+
+          let accountNoExists = await dataExists('Staff', {
+            accountNo: rawStaff.AccountNo,
+          });
+
+          if (accountNoExists)
+            errors[
+              `${index}`
+            ] += `, account no. [${rawStaff.AccountNo}] already exists`;
+
+          if (structureExists) {
+            if (!dept)
+              errors[
+                `${index}`
+              ] += `, department [${rawStaff.Department}] does not exists`;
+
+            if (!dsg)
+              errors[
+                `${index}`
+              ] += `, designation [${rawStaff.Designation}] does not exists`;
+
+            if (!bank)
+              errors[`${index}`] += `, bank [${rawStaff.Bank}] does not exists`;
+
+            if (!staffClass)
+              errors[
+                `${index}`
+              ] += `, class [${rawStaff.Class}] does not exists`;
+
+            if (dept && dsg && bank && staffClass && !accountNoExists) {
+              delete errors[`${index}`];
+              staffsData.push(
+                new Staff(
+                  null,
+                  dept.id,
+                  dsg.id,
+                  staffClass.id,
+                  salaryStructure.id,
+                  bank.id,
+                  rawStaff.Level,
+                  rawStaff.Grade,
+                  rawStaff.Surname,
+                  rawStaff.Firstname,
+                  rawStaff.Othername,
+                  rawStaff.Gender,
+                  rawStaff.DateOfEmp,
+                  rawStaff.DateOfRet,
+                  rawStaff.AccountNo,
+                  '/assets/avatar.png'
+                )
+              );
+            }
+          } else {
+            errors[
+              `${index}`
+            ] += `,level and grade [${rawStaff.Level}, ${rawStaff.grade}] does not match any annual salary in the salary structure.`;
+          }
+        } else {
+          errors[
+            `${index}`
+          ] += ` salary structure [${rawStaff.SalaryStructure}] does not exists`;
+        }
+
+        ++index;
+      }
+
+      console.log(Object.values(errors));
+
+      console.log(staffsData);
+      feedback = await createData("Staff", staffsData, [], null, true);
+      
+      if(!isEmpty(errors)){
+        feedback = new Feedback(Object.values(errors), false, "Operation failed")
+      }
+
+      // validateStaff(errors, staffData);
+      // if (isEmpty(errors)) {
+      //   //ok
+      //   // check if salary structure has level and grade
+      //   let structureExists = await dataExists('SalaryStructureList', {
+      //     level: staffData.level,
+      //     grade: staffData.grade,
+      //     structureId: staffData.salaryStrId,
+      //   });
+
+      //   if (!structureExists)
+      //     return res.json(
+      //       new Feedback(
+      //         null,
+      //         false,
+      //         'The selected level and grade does not match any salary in the structure list'
+      //       )
+      //     );
+
+      //   // create staff
+      //   feedback = await createData(Model, staffData, Constants.staffIncludes);
+      // } else {
+      //   feedback = generateFormErrorFeedack(errors);
+      // }
     } catch (error) {
       console.log(error);
       feedback = generateErrorFeedback(error);
