@@ -1,11 +1,7 @@
 const BaseModel = require('../db/models/index');
 const { Op } = BaseModel.Sequelize;
 const Feedback = require('../lib/Feedback');
-const {
-  createData,
-  updateData,
-  deleteData,
-} = require('../lib/helpers');
+const { createData, updateData, deleteData } = require('../lib/helpers');
 const Pager = require('../lib/Pager');
 const Sanitizer = require('../lib/Sanitizer');
 const {
@@ -284,6 +280,68 @@ exports.deleteSalary = async (req, res, next) => {
       feedback.message = Boolean(feedback.result)
         ? feedback.message
         : 'no data was deleted';
+    } else {
+      feedback = generateAuthErrorFeedback();
+    }
+  } catch (error) {
+    feedback = generateErrorFeedback(error);
+  }
+  res.json(feedback);
+};
+
+exports.salarySummary = async (req, res, next) => {
+  let { pid, authorization } = Sanitizer.sanitize(req.query);
+  let authUser = GetAuthUser(authorization);
+  let feedback;
+  try {
+    if (authUser) {
+      let totalMiscellanous = await BaseModel.SalaryMiscellanous.findAll({
+        attributes: [
+          [
+            BaseModel.Sequelize.fn(
+              'sum',
+              BaseModel.Sequelize.col('subTotalAmount')
+            ),
+            'total',
+          ],
+        ],
+        where: { payrollId: pid },
+        group: ['miscId'],
+        order: [[BaseModel.Miscellanous, 'title', 'ASC']],
+        include: { model: BaseModel.Miscellanous, attributes: ['title'] },
+      });
+
+      let totalStaffs = await BaseModel.Salary.count({
+        where: { payrollId: pid },
+      });
+
+      let totalStaffsGroup = await BaseModel.Salary.findAll({
+        where: { payrollId: pid },
+        attributes: [
+          [
+            BaseModel.Sequelize.fn('count', BaseModel.Sequelize.col('staffId')),
+            'total',
+          ],
+        ],
+        include: [
+          {
+            model: BaseModel.Staff,
+            attributes: ['classId'],
+            include: { model: BaseModel.StaffClass },
+          },
+        ],
+        group: ['Staff.classId'],
+      });
+
+      let totalSalary = await BaseModel.Salary.sum('netPay', {
+        where: { payrollId: pid },
+      });
+
+      feedback = new Feedback(
+        { totalMiscellanous, totalStaffs, totalStaffsGroup, totalSalary },
+        true,
+        'success'
+      );
     } else {
       feedback = generateAuthErrorFeedback();
     }

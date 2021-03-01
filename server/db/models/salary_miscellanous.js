@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      payrollId: {
+        type: DataTypes.INTEGER(11),
+        allowNull: true,
+        references: {
+          model: 'Payrolls',
+          key: 'id',
+        },
+      },
       salaryId: {
         type: DataTypes.INTEGER(11),
         allowNull: false,
@@ -35,6 +43,10 @@ module.exports = (sequelize, DataTypes) => {
     models.SalaryMiscellanous.belongsTo(models.Salary, {
       foreignKey: 'salaryId',
       model: 'salaries',
+    });
+    models.SalaryMiscellanous.belongsTo(models.Payroll, {
+      foreignKey: 'payrollId',
+      model: 'payrolls',
     });
   };
 

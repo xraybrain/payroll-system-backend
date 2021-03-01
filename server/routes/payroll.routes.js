@@ -13,6 +13,7 @@ const {
   calculatePayroll,
   updateSalary,
   deleteSalary,
+  salarySummary,
 } = require('../controllers/salary.controller');
 
 router.get('/payrolls/', getPayrolls);
@@ -25,5 +26,5 @@ router.get('/payrolls/salaries/', getSalaries);
 router.post('/payrolls/salaries/', calculatePayroll);
 router.put('/payrolls/salaries/', updateSalary);
 router.delete('/payrolls/salaries/', deleteSalary);
-
+router.get('/payrolls/salaries/summary', salarySummary);
 module.exports = router;

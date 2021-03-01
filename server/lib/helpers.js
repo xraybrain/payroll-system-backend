@@ -183,6 +183,14 @@ exports.validateSalary = (errors = {}, formData, isUpdating = false) => {
   validate.isFieldEmpty(errors, formData, { field: 'id' }, isUpdating);
 };
 
+exports.validatePassword = (errors = {}, formData) => {
+  validate.isFieldEmpty(errors, formData, { field: 'password' }, false);
+  validate.isFieldEmpty(errors, formData, { field: 'confirmPassword' }, false);
+  if (formData.password !== formData.confirmPassword) {
+    errors.confirmPassword = 'Password does not match confirm password.';
+  }
+};
+
 exports.deleteData = async (
   model,
   query = { field: '', value: '' },

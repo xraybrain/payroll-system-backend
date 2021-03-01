@@ -4,6 +4,11 @@ const bcrypt = require('bcryptjs');
 const Feedback = require('../lib/Feedback');
 require('dotenv').config();
 const { Constants } = require('../lib/models/Constants');
+const Sanitizer = require('../lib/Sanitizer');
+const { GetAuthUser } = require('../lib/AuthManager');
+const { generateAuthErrorFeedback } = require('../lib/models/ErrorHandler');
+const { validate } = require('../lib/validator.helper');
+const { validatePassword, encryptPassword, isEmpty } = require('../lib/helpers');
 
 module.exports.login = async (req, res, next) => {
   let { email, password } = req.body;
@@ -103,4 +108,32 @@ module.exports.getCurrentUser = async (req, res, next) => {
       res.json(feedback);
     }
   });
+};
+
+exports.resetPassword = async (req, res, next) => {
+  let { formData, authorization } = Sanitizer.sanitize(req.body);
+  let authUser = GetAuthUser(authorization);
+  let feedback;
+  let errors = {};
+  if (authUser) {
+    validatePassword(errors, formData);
+    console.log(errors);
+    if (isEmpty(errors)) {
+      let password = encryptPassword(formData.password);
+      let result = await BaseModel.Login.update(
+        { password },
+        { where: { id: authUser.login } }
+      );
+      feedback = new Feedback(result, true, 'success');
+    } else {
+      feedback = new Feedback(
+        errors,
+        false,
+        'This form has errors, please review and resubmit'
+      );
+    }
+  } else {
+    feedback = generateAuthErrorFeedback();
+  }
+  res.json(feedback);
 };

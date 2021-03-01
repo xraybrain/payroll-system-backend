@@ -7,10 +7,18 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
+      payrollId: {
+        type: Sequelize.INTEGER(11),
+        allowNull: true,
+        references: {
+          model: 'Payrolls',
+          key: 'id',
+        },
+      },
       mixedId: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
-        unique: true
+        unique: true,
       },
       miscId: {
         type: Sequelize.INTEGER(11),

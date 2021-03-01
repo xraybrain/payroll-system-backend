@@ -42,7 +42,13 @@ exports.calculateSalary = async (staff = {}, miscellanous = [], payrollId) => {
 
       if (calculated.misc)
         salaryMisc.push(
-          new SalaryMisc(null, calculated.misc.id, null, calculated.amount)
+          new SalaryMisc(
+            null,
+            calculated.misc.id,
+            payrollId,
+            null,
+            calculated.amount
+          )
         );
       calculated = calculate(
         MiscType.Deduction,
@@ -54,7 +60,13 @@ exports.calculateSalary = async (staff = {}, miscellanous = [], payrollId) => {
       totalDeducted += calculated.amount;
       if (calculated.misc)
         salaryMisc.push(
-          new SalaryMisc(null, calculated.misc.id, null, calculated.amount)
+          new SalaryMisc(
+            null,
+            calculated.misc.id,
+            payrollId,
+            null,
+            calculated.amount
+          )
         );
     }
   }
