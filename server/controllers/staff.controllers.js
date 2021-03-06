@@ -81,6 +81,8 @@ exports.saveStaff = async (req, res, next) => {
       let { formData, uploadURL, fileName } = feedback.result;
       formData = JSON.parse(formData);
       formData.fileName = fileName || uploadURL;
+      formData.imageUrl = '/assets/avatar.png';
+
       let staffData = createStaff(formData);
       let errors = {};
       validateStaff(errors, staffData);
@@ -224,36 +226,15 @@ exports.saveStaffsUpload = async (req, res, next) => {
       console.log(Object.values(errors));
 
       console.log(staffsData);
-      feedback = await createData("Staff", staffsData, [], null, true);
-      
-      if(!isEmpty(errors)){
-        feedback = new Feedback(Object.values(errors), false, "Operation failed")
+      feedback = await createData('Staff', staffsData, [], null, true);
+
+      if (!isEmpty(errors)) {
+        feedback = new Feedback(
+          Object.values(errors),
+          false,
+          'Operation failed'
+        );
       }
-
-      // validateStaff(errors, staffData);
-      // if (isEmpty(errors)) {
-      //   //ok
-      //   // check if salary structure has level and grade
-      //   let structureExists = await dataExists('SalaryStructureList', {
-      //     level: staffData.level,
-      //     grade: staffData.grade,
-      //     structureId: staffData.salaryStrId,
-      //   });
-
-      //   if (!structureExists)
-      //     return res.json(
-      //       new Feedback(
-      //         null,
-      //         false,
-      //         'The selected level and grade does not match any salary in the structure list'
-      //       )
-      //     );
-
-      //   // create staff
-      //   feedback = await createData(Model, staffData, Constants.staffIncludes);
-      // } else {
-      //   feedback = generateFormErrorFeedack(errors);
-      // }
     } catch (error) {
       console.log(error);
       feedback = generateErrorFeedback(error);
@@ -292,6 +273,30 @@ exports.updateStaff = async (req, res, next) => {
   } else {
     feedback = generatePermissionErrorFeedback();
   }
+  res.json(feedback);
+};
+
+exports.updateStaffPassport = async (req, res, next) => {
+  let feedback = new Feedback(null, false, 'failed');
+  feedback = req.body;
+  if (feedback.success) {
+    try {
+      let { formData, uploadURL, fileName } = feedback.result;
+      formData = JSON.parse(formData);
+      formData.fileName = fileName || uploadURL;
+      let staffData = createStaff(formData);
+
+      feedback = await updateData(
+        'Staff',
+        staffData,
+        { id: formData.id },
+        Constants.staffIncludes
+      );
+    } catch (error) {
+      console.log(error);
+      feedback = generateErrorFeedback(error);
+    }
+  } 
   res.json(feedback);
 };
 

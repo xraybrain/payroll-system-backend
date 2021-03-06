@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     models.Salary.belongsTo(models.Bank, {
       foreignKey: 'bankId',
       model: 'banks',
+      onDelete: 'CASCADE'
     });
     models.Salary.belongsTo(models.Payroll, {
       foreignKey: 'payrollId',

@@ -23,7 +23,9 @@ function filter(error, fileName, filters) {
   if (!filters.includes(extension)) error.fileType = 'File type not allowed';
 }
 
-module.exports = (options = { filters: [], uploadDir: '' }) => {
+module.exports = (
+  options = { filters: [], uploadDir: '', canSkipUpload: false }
+) => {
   return (req, res, next) => {
     let form = formidable.IncomingForm(); // The incoming form
     let filters = options.filters || ['jpg', 'jpeg', 'png', 'xlsx'];
@@ -99,6 +101,9 @@ module.exports = (options = { filters: [], uploadDir: '' }) => {
             });
           });
         }
+      } else if (options.canSkipUpload) {
+        req.body = new Feedback(fields, true, 'skiped');
+        return next();
       } else {
         req.body = new Feedback(
           null,

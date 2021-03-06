@@ -44,7 +44,7 @@ exports.getBanks = async (req, res, next) => {
   } catch (error) {
     feedback = generateErrorFeedback(error);
   }
-  
+
   res.json(feedback);
 };
 
@@ -59,12 +59,21 @@ exports.saveBank = async (req, res, next) => {
       validateBank(errors, bankData);
       if (isEmpty(errors)) {
         // ok
-        let bankExists = await dataExists('Bank', {
-          name: bankData.name,
-        });
-        if (bankExists)
+        let bankExists = await BaseModel.Bank.findOne(
+          {
+            where: { name: bankData.name },
+            paranoid: false
+          },
+          { paranoid: false }
+        );
+        if (bankExists && bankExists.deletedAt) {
+          await bankExists.restore();
+          feedback = new Feedback(bankExists, true, 'restored');
+        } else if (bankExists) {
           return res.send(new Feedback(null, false, 'Bank already exists'));
-        feedback = await createData('Bank', bankData);
+        } else {
+          feedback = await createData('Bank', bankData);
+        }
       } else {
         feedback = generateFormErrorFeedack(errors);
       }
